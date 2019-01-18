@@ -9,11 +9,15 @@ const client = new byteball.Client();
 let app = express();
 app.use(serveStatic(__dirname + '/dist'));
 
-app.get('/joint/:unit(*)', async (req, res) => {
+app.get('/joint/:unit(*)', function (req, res) {
   const { unit } = req.params;
-  client.api.getJoint(unit, (err, result) => {
+  client.api.getJoint(unit, function (err, result) {
     res.json(result);
   });
+});
+
+app.get('/x', function (req, res) {
+  res.json({ x: 1 });
 });
 
 app.get('*', function (req, res) {
