@@ -9,15 +9,25 @@ const client = new byteball.Client();
 let app = express();
 app.use(serveStatic(__dirname + '/dist'));
 
-app.get('/joint/:unit(*)', function (req, res) {
+app.get('/joint/:unit(*)', async function (req, res) {
   const { unit } = req.params;
-  client.api.getJoint(unit, function (err, result) {
-    res.json(result);
-  });
+  try {
+    const joint = await client.api.getJoint(unit);
+    res.json(joint);
+  } catch (err) {
+    console.log('Failed to load unit', err);
+    res.json(err);
+  }
 });
 
-app.get('/x', function (req, res) {
-  res.json({ x: 1 });
+app.get('/x', async function (req, res) {
+  try {
+    const joint = await client.api.getJoint('twk0emReTdRuEXYZb6gq/Om4wwwBc/Dbo8V7dtVLxsQ=');
+    res.json(joint);
+  } catch (err) {
+    console.log('Failed to load unit', err);
+    res.json(err);
+  }
 });
 
 app.get('*', function (req, res) {
