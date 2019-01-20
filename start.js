@@ -1,33 +1,20 @@
 const express = require('express');
-const byteball = require('byteball');
+const kbyte = require('kbyte');
 const serveStatic = require('serve-static');
 const SocketServer = require('ws').Server;
 const db = require('./server/db');
 
-const client = new byteball.Client();
+const client = new kbyte.Client('wss://obyte.org/bb');
+setInterval(() => client.request('heartbeat', null), 10 * 1000);
 
 let app = express();
 app.use(serveStatic(__dirname + '/dist'));
 
-app.get('/joint/:unit(*)', async function (req, res) {
+app.get('/joint/:unit(*)', function (req, res) {
   const { unit } = req.params;
-  try {
-    const joint = await client.api.getJoint(unit);
-    res.json(joint);
-  } catch (err) {
-    console.log('Failed to load unit', err);
-    res.json(err);
-  }
-});
-
-app.get('/x', async function (req, res) {
-  try {
-    const joint = await client.api.getJoint('twk0emReTdRuEXYZb6gq/Om4wwwBc/Dbo8V7dtVLxsQ=');
-    res.json(joint);
-  } catch (err) {
-    console.log('Failed to load unit', err);
-    res.json(err);
-  }
+  client.request('get_joint', unit, function(err, result) {
+    res.json(result);
+  });
 });
 
 app.get('*', function (req, res) {
